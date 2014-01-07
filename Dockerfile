@@ -9,6 +9,8 @@ RUN 	dpkg-divert --local --rename --add /sbin/initctl && \
     	ln -s /bin/true /sbin/initctl
 
 RUN 	echo "*.* @172.17.42.1:514" >> /etc/rsyslog.d/90-networking.conf
+ADD	supervisor-slapd.conf /etc/supervisor/conf.d/
+ADD	supervisor-rsyslogd.conf /etc/supervisor/conf.d/
 
 # Don't start slapd on install
 run	echo "#!/bin/sh\nexit 101" >/usr/sbin/policy-rc.d
