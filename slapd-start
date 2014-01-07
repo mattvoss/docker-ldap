@@ -31,7 +31,27 @@ slapd slapd/dump_database select when needed
 EOF
 
   dpkg-reconfigure -f noninteractive slapd
+  
+  cat > /etc/supervisor/conf.d/slapd.conf <<EOF
+	[program:slapd]
+	priority=20
+	directory=/tmp
+	command=/usr/bin/slapd-start
+	user=root
+	autostart=true
+	autorestart=true
+	stdout_logfile=syslog
+	stderr_logfile=syslog
+  EOF
 
+  cat > /etc/supervisor/conf.d/rsyslogd.conf <<EOF
+	[program:rsyslogd]
+	command=rsyslogd -n -c5
+	startsecs=5
+	stopwaitsecs=5
+	autostart=true
+	autorestart=true
+  EOF
   touch /var/lib/ldap/docker_bootstrapped
 else
   status "found already-configured slapd"
@@ -39,4 +59,4 @@ fi
 
 status "starting slapd"
 set -x
-exec /usr/sbin/slapd -h "ldap:///" -u openldap -g openldap -d 160
+exec /usr/sbin/slapd -h "ldap:///" -u openldap -g openldap -s 160
